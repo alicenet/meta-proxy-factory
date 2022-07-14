@@ -1,0 +1,39 @@
+{
+    "version": "0.1.0",
+    "name": "proxy-factory",
+    "scripts": {
+        "node": "npx hardhat node --port 8585",
+        "test": "npx hardhat test",
+        "compile": "npx hardhat compile",
+        "abi": "npx hardhat export-abi"
+    },
+    "devDependencies": {
+        "@nomiclabs/hardhat-ethers": "^2.0.4",
+        "@nomiclabs/hardhat-etherscan": "^3.0.3",
+        "@nomiclabs/hardhat-truffle5": "^2.0.5",
+        "@nomiclabs/hardhat-waffle": "^2.0.2",
+        "@typechain/hardhat": "^6.0.0",
+        "@types/mocha": "^9.1.1",
+        "chai": "^4.3.6",
+        "erc721a": "^4.1.0",
+        "ethereum-waffle": "^3.4.0",
+        "ethers": "^5.5.4",
+        "hardhat": "^2.9.3",
+        "hardhat-contract-sizer": "^2.5.1",
+        "hardhat-deploy": "^0.11.4",
+        "hardhat-gas-reporter": "^1.0.8",
+        "hardhat-truffle5": "^1.0.1",
+        "mocha": "^9.2.2",
+        "solc": "^0.8.11",
+        "solidity-coverage": "^0.7.21",
+        "ts-node": "^10.7.0"
+    },
+    "dependencies": {
+        "@openzeppelin/contracts": "^4.5.0",
+        "concurrently": "^7.0.0",
+        "dotenv": "^16.0.0",
+        "hardhat-abi-exporter": "^2.8.0",
+        "wait-on": "^6.0.1",
+        "web3": "^1.7.1"
+    }
+}
