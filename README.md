@@ -7,7 +7,7 @@
 
 ## Installation
 ```
-npm install https://github.com/alicenet/metaproxyfactory
+npm i --save-dev https://github.com/alicenet/meta-proxy-factory
 ````
 ## Usage
 > Examples in javascript

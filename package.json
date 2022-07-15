@@ -1,6 +1,6 @@
 {
     "version": "0.1.0",
-    "name": "proxy-factory",
+    "name": "meta-proxy-factory",
     "scripts": {
         "node": "npx hardhat node --port 8585",
         "test": "npx hardhat test",

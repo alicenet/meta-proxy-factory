@@ -6,7 +6,7 @@
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "outDir": "dist",
+    "outDir": "./dist",
     "resolveJsonModule": true,
     "declaration": true
   },
@@ -16,7 +16,8 @@
     "./contracts",
     "./typechain-types/**/*",
     "**/*.ts",
-    "./decs.d.ts"
+    "./decs.d.ts",
+    "./utils"
   ],
   "files": ["./hardhat.config.ts"]
 }
