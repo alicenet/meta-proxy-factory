@@ -1,0 +1,29 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "ProxyChild",
+  "sourceName": "contracts/ProxyChild.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "getFactory",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x60a0604052348015600f57600080fd5b503360805260805160ad61002c6000396000602f015260ad6000f3fe6080604052348015600f57600080fd5b506004361060285760003560e01c806388cc58e414602d575b600080fd5b7f000000000000000000000000000000000000000000000000000000000000000060405173ffffffffffffffffffffffffffffffffffffffff909116815260200160405180910390f3fea26469706673582212202c96833b7736a582b792b16b9b781283daec3d0c791cf336944477f26a2450af64736f6c634300080b0033",
+  "deployedBytecode": "0x6080604052348015600f57600080fd5b506004361060285760003560e01c806388cc58e414602d575b600080fd5b7f000000000000000000000000000000000000000000000000000000000000000060405173ffffffffffffffffffffffffffffffffffffffff909116815260200160405180910390f3fea26469706673582212202c96833b7736a582b792b16b9b781283daec3d0c791cf336944477f26a2450af64736f6c634300080b0033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

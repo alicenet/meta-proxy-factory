@@ -1,0 +1,281 @@
+{
+  "id": "b78cd4d46b2d03fc8e8507b237078fd2",
+  "_format": "hh-sol-build-info-1",
+  "solcVersion": "0.8.11",
+  "solcLongVersion": "0.8.11+commit.d7f03943",
+  "input": {
+    "language": "Solidity",
+    "sources": {
+      "contracts/proxy/ProxyInternalUpgradeLock.sol": {
+        "content": "// SPDX-License-Identifier: MIT-open-group\npragma solidity ^0.8.11;\n\n/**\n * @title ProxyInternalUpgradeLock\n * @author Hunter Prendergast (et3p), ZJ Lin, Troy Salem (Cr0wn_Gh0ul)\n */\nabstract contract ProxyInternalUpgradeLock {\n    function __lockImplementation() internal {\n        assembly {\n            let implSlot := not(0x00)\n            sstore(\n                implSlot,\n                or(\n                    0xca11c0de15dead10cced00000000000000000000000000000000000000000000,\n                    sload(implSlot)\n                )\n            )\n        }\n    }\n}"
+      }
+    },
+    "settings": {
+      "outputSelection": {
+        "*": {
+          "*": [
+            "metadata",
+            "evm.bytecode",
+            "evm.bytecode.sourceMap",
+            "abi",
+            "evm.deployedBytecode",
+            "evm.methodIdentifiers",
+            "devdoc",
+            "userdoc",
+            "storageLayout",
+            "evm.gasEstimates"
+          ],
+          "": [
+            "ast"
+          ]
+        },
+        "def": {
+          "MyContract": [
+            "abi",
+            "evm.bytecode.opcodes"
+          ]
+        }
+      },
+      "metadata": {
+        "useLiteralContent": true
+      },
+      "optimizer": {
+        "enabled": true,
+        "runs": 20000000
+      }
+    }
+  },
+  "output": {
+    "contracts": {
+      "contracts/proxy/ProxyInternalUpgradeLock.sol": {
+        "ProxyInternalUpgradeLock": {
+          "abi": [],
+          "devdoc": {
+            "author": "Hunter Prendergast (et3p), ZJ Lin, Troy Salem (Cr0wn_Gh0ul)",
+            "kind": "dev",
+            "methods": {},
+            "title": "ProxyInternalUpgradeLock",
+            "version": 1
+          },
+          "evm": {
+            "bytecode": {
+              "functionDebugData": {},
+              "generatedSources": [],
+              "linkReferences": {},
+              "object": "",
+              "opcodes": "",
+              "sourceMap": ""
+            },
+            "deployedBytecode": {
+              "functionDebugData": {},
+              "generatedSources": [],
+              "immutableReferences": {},
+              "linkReferences": {},
+              "object": "",
+              "opcodes": "",
+              "sourceMap": ""
+            },
+            "gasEstimates": null,
+            "methodIdentifiers": {}
+          },
+          "metadata": "{\"compiler\":{\"version\":\"0.8.11+commit.d7f03943\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"author\":\"Hunter Prendergast (et3p), ZJ Lin, Troy Salem (Cr0wn_Gh0ul)\",\"kind\":\"dev\",\"methods\":{},\"title\":\"ProxyInternalUpgradeLock\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/proxy/ProxyInternalUpgradeLock.sol\":\"ProxyInternalUpgradeLock\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":20000000},\"remappings\":[]},\"sources\":{\"contracts/proxy/ProxyInternalUpgradeLock.sol\":{\"content\":\"// SPDX-License-Identifier: MIT-open-group\\npragma solidity ^0.8.11;\\n\\n/**\\n * @title ProxyInternalUpgradeLock\\n * @author Hunter Prendergast (et3p), ZJ Lin, Troy Salem (Cr0wn_Gh0ul)\\n */\\nabstract contract ProxyInternalUpgradeLock {\\n    function __lockImplementation() internal {\\n        assembly {\\n            let implSlot := not(0x00)\\n            sstore(\\n                implSlot,\\n                or(\\n                    0xca11c0de15dead10cced00000000000000000000000000000000000000000000,\\n                    sload(implSlot)\\n                )\\n            )\\n        }\\n    }\\n}\",\"keccak256\":\"0xcb746171c10563b602f933374f6a3e84f76b815757a57a9bc38bead27595c9c8\",\"license\":\"MIT-open-group\"}},\"version\":1}",
+          "storageLayout": {
+            "storage": [],
+            "types": null
+          },
+          "userdoc": {
+            "kind": "user",
+            "methods": {},
+            "version": 1
+          }
+        }
+      }
+    },
+    "sources": {
+      "contracts/proxy/ProxyInternalUpgradeLock.sol": {
+        "ast": {
+          "absolutePath": "contracts/proxy/ProxyInternalUpgradeLock.sol",
+          "exportedSymbols": {
+            "ProxyInternalUpgradeLock": [
+              8
+            ]
+          },
+          "id": 9,
+          "license": "MIT-open-group",
+          "nodeType": "SourceUnit",
+          "nodes": [
+            {
+              "id": 1,
+              "literals": [
+                "solidity",
+                "^",
+                "0.8",
+                ".11"
+              ],
+              "nodeType": "PragmaDirective",
+              "src": "43:24:0"
+            },
+            {
+              "abstract": true,
+              "baseContracts": [],
+              "canonicalName": "ProxyInternalUpgradeLock",
+              "contractDependencies": [],
+              "contractKind": "contract",
+              "documentation": {
+                "id": 2,
+                "nodeType": "StructuredDocumentation",
+                "src": "69:113:0",
+                "text": " @title ProxyInternalUpgradeLock\n @author Hunter Prendergast (et3p), ZJ Lin, Troy Salem (Cr0wn_Gh0ul)"
+              },
+              "fullyImplemented": true,
+              "id": 8,
+              "linearizedBaseContracts": [
+                8
+              ],
+              "name": "ProxyInternalUpgradeLock",
+              "nameLocation": "201:24:0",
+              "nodeType": "ContractDefinition",
+              "nodes": [
+                {
+                  "body": {
+                    "id": 6,
+                    "nodeType": "Block",
+                    "src": "273:296:0",
+                    "statements": [
+                      {
+                        "AST": {
+                          "nodeType": "YulBlock",
+                          "src": "292:271:0",
+                          "statements": [
+                            {
+                              "nodeType": "YulVariableDeclaration",
+                              "src": "306:25:0",
+                              "value": {
+                                "arguments": [
+                                  {
+                                    "kind": "number",
+                                    "nodeType": "YulLiteral",
+                                    "src": "326:4:0",
+                                    "type": "",
+                                    "value": "0x00"
+                                  }
+                                ],
+                                "functionName": {
+                                  "name": "not",
+                                  "nodeType": "YulIdentifier",
+                                  "src": "322:3:0"
+                                },
+                                "nodeType": "YulFunctionCall",
+                                "src": "322:9:0"
+                              },
+                              "variables": [
+                                {
+                                  "name": "implSlot",
+                                  "nodeType": "YulTypedName",
+                                  "src": "310:8:0",
+                                  "type": ""
+                                }
+                              ]
+                            },
+                            {
+                              "expression": {
+                                "arguments": [
+                                  {
+                                    "name": "implSlot",
+                                    "nodeType": "YulIdentifier",
+                                    "src": "368:8:0"
+                                  },
+                                  {
+                                    "arguments": [
+                                      {
+                                        "kind": "number",
+                                        "nodeType": "YulLiteral",
+                                        "src": "418:66:0",
+                                        "type": "",
+                                        "value": "0xca11c0de15dead10cced00000000000000000000000000000000000000000000"
+                                      },
+                                      {
+                                        "arguments": [
+                                          {
+                                            "name": "implSlot",
+                                            "nodeType": "YulIdentifier",
+                                            "src": "512:8:0"
+                                          }
+                                        ],
+                                        "functionName": {
+                                          "name": "sload",
+                                          "nodeType": "YulIdentifier",
+                                          "src": "506:5:0"
+                                        },
+                                        "nodeType": "YulFunctionCall",
+                                        "src": "506:15:0"
+                                      }
+                                    ],
+                                    "functionName": {
+                                      "name": "or",
+                                      "nodeType": "YulIdentifier",
+                                      "src": "394:2:0"
+                                    },
+                                    "nodeType": "YulFunctionCall",
+                                    "src": "394:145:0"
+                                  }
+                                ],
+                                "functionName": {
+                                  "name": "sstore",
+                                  "nodeType": "YulIdentifier",
+                                  "src": "344:6:0"
+                                },
+                                "nodeType": "YulFunctionCall",
+                                "src": "344:209:0"
+                              },
+                              "nodeType": "YulExpressionStatement",
+                              "src": "344:209:0"
+                            }
+                          ]
+                        },
+                        "evmVersion": "london",
+                        "externalReferences": [],
+                        "id": 5,
+                        "nodeType": "InlineAssembly",
+                        "src": "283:280:0"
+                      }
+                    ]
+                  },
+                  "id": 7,
+                  "implemented": true,
+                  "kind": "function",
+                  "modifiers": [],
+                  "name": "__lockImplementation",
+                  "nameLocation": "241:20:0",
+                  "nodeType": "FunctionDefinition",
+                  "parameters": {
+                    "id": 3,
+                    "nodeType": "ParameterList",
+                    "parameters": [],
+                    "src": "261:2:0"
+                  },
+                  "returnParameters": {
+                    "id": 4,
+                    "nodeType": "ParameterList",
+                    "parameters": [],
+                    "src": "273:0:0"
+                  },
+                  "scope": 8,
+                  "src": "232:337:0",
+                  "stateMutability": "nonpayable",
+                  "virtual": false,
+                  "visibility": "internal"
+                }
+              ],
+              "scope": 9,
+              "src": "183:388:0",
+              "usedErrors": []
+            }
+          ],
+          "src": "43:528:0"
+        },
+        "id": 0
+      }
+    }
+  }
+}
