@@ -6,19 +6,11 @@
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "outDir": "./dist",
+    "outDir": "./lib",
     "resolveJsonModule": true,
     "declaration": true
   },
   "include": [
-    "./test",
-    "./scripts",
-    "./contracts",
-    "./typechain-types/**/*",
-    "**/*.ts",
-    "./decs.d.ts",
-    "./utils"
-  ],
-  "files": ["./hardhat.config.ts"]
+    "src"
+  ]
 }
-

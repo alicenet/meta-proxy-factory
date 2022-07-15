@@ -1,7 +1,7 @@
 {
     "version": "0.1.0",
     "name": "meta-proxy-factory",
-    "main": "index.js",
+    "main": "lib/index.js",
     "scripts": {
         "prepare" : "npm run build",
         "build": "tsc",

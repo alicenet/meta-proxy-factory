@@ -4,28 +4,26 @@ import {
     ContractTransaction
 } from "ethers";
 import { isHexString } from "ethers/lib/utils";
-import { ethers } from "hardhat";
-import {
-    ProxyFactory
-} from "../typechain-types";
-const hre = require("hardhat");
+const proxyFactoryArtifact = require("../artifacts/contracts/ProxyFactory.sol/ProxyFactory.json");
 
 export const deployUpgradeableWithFactory = async (
-    factory: ProxyFactory,
+    factory: Contract,
     contractName: string,
     salt?: string,
     initCallData?: any[],
     constructorArgs: any[] = []
 ): Promise<Contract> => {
-    const _Contract = await ethers.getContractFactory(contractName);
+    const hre: any = await require("hardhat");
+    const signers = await hre.ethers.getSigners();
+    const _Contract = await hre.ethers.getContractFactory(contractName);
     let deployCode: BytesLike;
 
     (deployCode = _Contract.getDeployTransaction(...constructorArgs).data as BytesLike)
 
-    const hre: any = await require("hardhat");
+    
 
     const transaction = await factory.deployCreate(deployCode);
-    let receipt = await ethers.provider.getTransactionReceipt(transaction.hash);
+    let receipt = await hre.ethers.provider.getTransactionReceipt(transaction.hash);
     if (
         receipt.gasUsed.gt(10_000_000) &&
         hre.__SOLIDITY_COVERAGE_RUNNING !== true
@@ -44,7 +42,7 @@ export const deployUpgradeableWithFactory = async (
     }
 
     const transaction2 = await factory.deployProxy(saltBytes);
-    receipt = await ethers.provider.getTransactionReceipt(transaction2.hash);
+    receipt = await hre.ethers.provider.getTransactionReceipt(transaction2.hash);
     if (
         receipt.gasUsed.gt(10_000_000) &&
         hre.__SOLIDITY_COVERAGE_RUNNING !== true
@@ -85,8 +83,9 @@ export const getContractAddressFromEventLog = async (
     eventSignature: string,
     eventName: string
 ): Promise<string> => {
-    const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
-    const intrface = new ethers.utils.Interface([eventSignature]);
+    const hre: any = await require("hardhat");
+    const receipt = await hre.ethers.provider.getTransactionReceipt(tx.hash);
+    const intrface = new hre.ethers.utils.Interface([eventSignature]);
     let result = "";
     for (const log of receipt.logs) {
         const topics = log.topics;
@@ -106,7 +105,8 @@ export const getContractAddressFromEventLog = async (
 }
 
 export const getBytes32Salt = (contractName: string) => {
-    return ethers.utils.formatBytes32String(contractName);
+    const hre: any = require("hardhat");
+    return hre.ethers.utils.formatBytes32String(contractName);
 }
 
 export const getContractAddressFromDeployedProxyEvent = async (
@@ -118,13 +118,16 @@ export const getContractAddressFromDeployedProxyEvent = async (
 }
 
 export const deployFactory = async () => {
-    const factoryBase = await ethers.getContractFactory("ProxyFactory");
+    const hre: any = await require("hardhat");
+    const signers = await hre.ethers.getSigners();
+    let factoryBase = new hre.ethers.ContractFactory(proxyFactoryArtifact.abi, proxyFactoryArtifact.bytecode, signers[0])
     const factory = await factoryBase.deploy();
     return factory;
 }
 
 export const getAccounts = async () => {
-    const signers = await ethers.getSigners();
+    const hre: any = await require("hardhat");
+    const signers = await hre.ethers.getSigners();
     const accounts = [];
     for (const signer of signers) {
         accounts.push(signer.address);
@@ -136,6 +139,7 @@ export const getMetamorphicAddress = (
     factoryAddress: string,
     salt: string,
 ) => {
+    const hre: any = require("hardhat");
     const initCode = "0x6020363636335afa1536363636515af43d36363e3d36f3";
     return hre.ethers.utils.getCreate2Address(
         factoryAddress,
