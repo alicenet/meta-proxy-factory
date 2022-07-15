@@ -1,7 +1,10 @@
 {
     "version": "0.1.0",
     "name": "meta-proxy-factory",
+    "main": "index.js",
     "scripts": {
+        "prepare" : "npm run build",
+        "build": "tsc",
         "node": "npx hardhat node --port 8585",
         "test": "npx hardhat test",
         "compile": "npx hardhat compile",
