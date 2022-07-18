@@ -29,9 +29,8 @@ Has a fallback function, inside the fallback function theres an admin function t
 The factory has a _upgradeProxy function for upgrading proxies by changing their logic contract address. To allow upgrade lock logic contract can implement ProxyInternalUpgradeLock.
 
 ##### Deploying Upgradeable Proxies
-By default a proxy template is deployed in the constructor of alicenet factory. 
-The deployProxy function sets the _implementation variable to the value in _proxyTemplate and deploys a metamorphic contract with a salt that identifies that contract. Then deploy the logic for the contract using deployCreate function
-Then using the upgradeProxy function to point the proxy to the logic contract location. Init call data can also be passed in as an argument to initialize the proxy.
+By default a proxy template is deployed in the constructor of proxy factory. 
+The deployProxy function sets the _implementation variable to the value in _proxyTemplate and deploys a metamorphic contract with a salt that identifies that contract. Then deploy the logic for the contract using deployCreate function. Then using the upgradeProxy function to point the proxy to the logic contract location. Init call data can also be passed in as an argument to initialize the proxy.
 These calls can also be done with one tx using multiCall function
 
 ## Docs
