@@ -3,7 +3,7 @@
     "name": "meta-proxy-factory",
     "main": "lib/index.js",
     "scripts": {
-        "prepare" : "npm run build",
+        "prepare": "npm run build",
         "build": "tsc",
         "node": "npx hardhat node --port 8585",
         "test": "npx hardhat test",
@@ -15,6 +15,7 @@
         "@nomiclabs/hardhat-etherscan": "^3.0.3",
         "@nomiclabs/hardhat-truffle5": "^2.0.5",
         "@nomiclabs/hardhat-waffle": "^2.0.2",
+        "@openzeppelin/contracts": "^4.8.2",
         "@typechain/hardhat": "^6.0.0",
         "@types/mocha": "^9.1.1",
         "chai": "^4.3.6",
@@ -32,7 +33,6 @@
         "ts-node": "^10.7.0"
     },
     "dependencies": {
-        "@openzeppelin/contracts": "^4.5.0",
         "concurrently": "^7.0.0",
         "dotenv": "^16.0.0",
         "hardhat-abi-exporter": "^2.8.0",

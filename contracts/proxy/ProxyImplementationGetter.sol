@@ -1,21 +1,15 @@
 // SPDX-License-Identifier: MIT-open-group
 pragma solidity ^0.8.17;
 
-/**
- * @title ProxyUpgrader
- * @author Hunter Prendergast (et3p), ZJ Lin, Troy Salem (Cr0wn_Gh0ul)
- */
-abstract contract ProxyUpgrader {
-    function __upgrade(address _proxy, address _newImpl) internal {
-        bytes memory cdata = abi.encodePacked(
-            hex"ca11c0de11",
-            uint256(uint160(_newImpl))
-        );
+abstract contract ProxyImplementationGetter {
+    function __getProxyImplementation(
+        address _proxy
+    ) internal view returns (address implAddress) {
+        bytes memory cdata = hex"0cbcae703c";
         assembly ("memory-safe") {
-            let success := call(
+            let success := staticcall(
                 gas(),
                 _proxy,
-                0,
                 add(cdata, 0x20),
                 mload(cdata),
                 0x00,
@@ -27,6 +21,7 @@ abstract contract ProxyUpgrader {
             if iszero(success) {
                 revert(ptr, returndatasize())
             }
+            implAddress := shr(96, mload(ptr))
         }
     }
 }

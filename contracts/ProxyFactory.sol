@@ -6,7 +6,7 @@ import "./ProxyFactoryBase.sol";
 
 /**
  * @title ProxyFactory
- * @author Hunter Prendergast (et3p), ZJ Lin, Troy Salem (Cr0wn_Gh0ul)
+ * @author Hunter Prendergast (et3p), ZJ Lin, Troy Salem (Cr0wn_Gh0ul), Leonardo Teixeira(vtleonardo)
  */
 /// @custom:salt ProxyFactory
 contract ProxyFactory is ProxyFactoryBase {
@@ -21,49 +21,49 @@ contract ProxyFactory is ProxyFactoryBase {
     constructor() ProxyFactoryBase() {}
 
     /**
-     * @dev callAny allows EOA to call function impersonating the factory address
+     * @notice callAny allows EOA to call function impersonating the factory address
      * @param target_: the address of the contract to be called
      * @param value_: value in WEIs to send together the call
      * @param cdata_: Hex encoded state with function signature + arguments of the target function to be called
+     * @return the return of the calls as a byte array
      */
     function callAny(
         address target_,
         uint256 value_,
         bytes calldata cdata_
-    ) public payable onlyOwner {
+    ) public payable onlyOwner returns (bytes memory) {
         bytes memory cdata = cdata_;
-        _callAny(target_, value_, cdata);
-        _returnAvailableData();
+        return _callAny(target_, value_, cdata);
     }
 
     /**
-     * @dev delegateCallAny allows EOA to call a function in a contract without impersonating the factory
-     * @param target_: the address of the contract to be called
-     * @param cdata_: Hex encoded state with function signature + arguments of the target function to be called
-     */
-    function delegateCallAny(address target_, bytes calldata cdata_)
-        public
-        payable
-        onlyOwnerOrDelegator
-    {
-        bytes memory cdata = cdata_;
-        _delegateCallAny(target_, cdata);
-        _returnAvailableData();
-    }
-
-    /**
-     * @dev deployCreate allows the owner to deploy raw contracts through the factory using
+     * @notice deployCreate allows the owner to deploy raw contracts through the factory using
      * non-deterministic address generation (create OpCode)
      * @param deployCode_ Hex encoded state with the deployment code of the contract to be deployed +
      * constructors' args (if any)
      * @return contractAddr the deployed contract address
      */
-    function deployCreate(bytes calldata deployCode_)
-        public
-        onlyOwner
-        returns (address contractAddr)
-    {
+    function deployCreate(
+        bytes calldata deployCode_
+    ) public onlyOwner returns (address contractAddr) {
         return _deployCreate(deployCode_);
+    }
+
+    /**
+     * @notice allows the owner to deploy contracts through the factory using
+     * non-deterministic address generation and record the address to external contract mapping
+     * @param deployCode_ Hex encoded state with the deployment code of the contract to be deployed +
+     * constructors' args (if any)
+     * @param salt_ salt used to determine the final determinist address for the deployed contract
+     * @return contractAddr the deployed contract address
+     */
+    function deployCreateAndRegister(
+        bytes calldata deployCode_,
+        bytes32 salt_
+    ) public onlyOwner returns (address contractAddr) {
+        address newContractAddress = _deployCreate(deployCode_);
+        _addNewContract(salt_, newContractAddress);
+        return newContractAddress;
     }
 
     /**
@@ -87,38 +87,10 @@ contract ProxyFactory is ProxyFactoryBase {
      * @dev deployProxy deploys a proxy contract with upgradable logic. See Proxy.sol contract.
      * @param salt_ salt used to determine the final determinist address for the deployed contract
      */
-    function deployProxy(bytes32 salt_) public onlyOwner returns (address contractAddr) {
+    function deployProxy(
+        bytes32 salt_
+    ) public onlyOwner returns (address contractAddr) {
         contractAddr = _deployProxy(salt_);
-    }
-
-    /**
-     * @dev deployStatic finishes the deployment started with the deployTemplate of a contract with
-     * determinist address. This function call any initialize() function in the deployed contract
-     * in case the arguments are provided. Should be called after deployTemplate.
-     * @param salt_ salt used to determine the final determinist address for the deployed contract
-     * @param initCallData_ Hex encoded initialization function signature + parameters to initialize the deployed contract
-     * @return contractAddr the address of the deployed template contract
-     */
-    function deployStatic(bytes32 salt_, bytes calldata initCallData_)
-        public
-        onlyOwner
-        returns (address contractAddr)
-    {
-        contractAddr = _deployStatic(salt_, initCallData_);
-    }
-
-    /**
-     * @dev deployTemplate deploys a template contract with the universal code copy constructor that
-     * deploys the contract+constructorArgs defined in the deployCode_ as the contracts runtime code.
-     * @param deployCode_ Hex encoded state with the deploymentCode + (constructor args appended if any)
-     * @return contractAddr the address of the deployed template contract
-     */
-    function deployTemplate(bytes calldata deployCode_)
-        public
-        onlyOwner
-        returns (address contractAddr)
-    {
-        contractAddr = _deployTemplate(deployCode_);
     }
 
     /**
@@ -127,10 +99,10 @@ contract ProxyFactory is ProxyFactoryBase {
      * @param initCallData_ Hex encoded initialization function signature + parameters to initialize the
      * deployed contract
      */
-    function initializeContract(address contract_, bytes calldata initCallData_)
-        public
-        onlyOwnerOrDelegator
-    {
+    function initializeContract(
+        address contract_,
+        bytes calldata initCallData_
+    ) public onlyOwner {
         _initializeContract(contract_, initCallData_);
     }
 
@@ -139,8 +111,10 @@ contract ProxyFactory is ProxyFactoryBase {
      * impersonating the factory
      * @param cdata_: array of hex encoded state with the function calls (function signature + arguments)
      */
-    function multiCall(bytes[] calldata cdata_) public onlyOwner {
-        _multiCall(cdata_);
+    function multiCall(
+        MultiCallArgs[] calldata cdata_
+    ) public onlyOwner returns (bytes[] memory) {
+        return _multiCall(cdata_);
     }
 
     /**
@@ -156,5 +130,16 @@ contract ProxyFactory is ProxyFactoryBase {
         bytes calldata initCallData_
     ) public onlyOwner {
         _upgradeProxy(salt_, newImpl_, initCallData_);
+    }
+
+    /**
+     * @notice getter function for retrieving the implementation address of an AliceNet proxy.
+     * @param proxyAddress_ the address of the proxy
+     * @return the address of implementation/logic contract used by the proxy
+     */
+    function getProxyImplementation(
+        address proxyAddress_
+    ) public view returns (address) {
+        return __getProxyImplementation(proxyAddress_);
     }
 }

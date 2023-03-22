@@ -11,7 +11,7 @@ import "solidity-coverage";
 import "hardhat-contract-sizer";
 import "hardhat-deploy";
 import os from "os";
-require('hardhat-abi-exporter');
+require("hardhat-abi-exporter");
 
 dotenv.config();
 
@@ -58,14 +58,12 @@ module.exports = {
   solidity: {
     compilers: [
       {
-        version: "0.8.11",
+        version: "0.8.17",
         settings: {
           outputSelection: {
             "*": {
               "*": ["metadata", "evm.bytecode", "evm.bytecode.sourceMap"],
-              "": [
-                "ast",
-              ],
+              "": ["ast"],
             },
             def: {
               MyContract: ["abi", "evm.bytecode.opcodes"],
@@ -104,5 +102,5 @@ module.exports = {
     timeout: 2200000,
     jobs: os.cpus().length / 2 > 1 ? os.cpus().length / 2 : 1,
   },
-}
+};
 //export default config;

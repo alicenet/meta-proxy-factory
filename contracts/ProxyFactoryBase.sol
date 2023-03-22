@@ -4,21 +4,31 @@ import "./proxy/Proxy.sol";
 import "./DeterministicAddress.sol";
 import "./proxy/ProxyUpgrader.sol";
 import "./proxy/IProxy.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
+import "contracts/Errors.sol";
+import "contracts/proxy/ProxyImplementationGetter.sol";
 
 /**
  * @title ProxyFactoryBase
  * @author Hunter Prendergast (et3p), ZJ Lin, Troy Salem (Cr0wn_Gh0ul)
  */
-abstract contract ProxyFactoryBase is DeterministicAddress, ProxyUpgrader {
+abstract contract ProxyFactoryBase is
+    DeterministicAddress,
+    ProxyUpgrader,
+    ProxyImplementationGetter
+{
+    using Address for address;
+
+    struct MultiCallArgs {
+        address target;
+        uint256 value;
+        bytes data;
+    }
+
     /**
     @dev owner role for privileged access to functions
     */
     address private _owner;
-
-    /**
-    @dev delegator role for privileged access to delegateCallAny
-    */
-    address private _delegator;
 
     /**
     @dev array to store list of contract salts
@@ -34,6 +44,8 @@ abstract contract ProxyFactoryBase is DeterministicAddress, ProxyUpgrader {
 
     bytes8 private constant _UNIVERSAL_DEPLOY_CODE = 0x38585839386009f3;
 
+    mapping(bytes32 => address) internal _contractRegistry;
+
     /**
      *@dev events that notify of contract deployment
      */
@@ -42,18 +54,11 @@ abstract contract ProxyFactoryBase is DeterministicAddress, ProxyUpgrader {
     event DeployedStatic(address contractAddr);
     event DeployedRaw(address contractAddr);
     event DeployedProxy(address contractAddr);
+    event UpgradedProxy(bytes32 salt, address proxyAddr, address newlogicAddr);
 
     // modifier restricts caller to owner or self via multicall
     modifier onlyOwner() {
         require(msg.sender == address(this) || msg.sender == owner());
-        _;
-    }
-
-    // modifier restricts caller to owner or self via multicall
-    modifier onlyOwnerOrDelegator() {
-        require(
-            msg.sender == address(this) || msg.sender == owner() || msg.sender == delegator()
-        );
         _;
     }
 
@@ -74,9 +79,13 @@ abstract contract ProxyFactoryBase is DeterministicAddress, ProxyUpgrader {
         );
         //variable to store the address created from create(the location of the proxy template contract)
         address addr;
-        assembly {
+        assembly ("memory-safe") {
             //deploys the proxy template contract
-            addr := create(0, add(proxyDeployCode, 0x20), mload(proxyDeployCode))
+            addr := create(
+                0,
+                add(proxyDeployCode, 0x20),
+                mload(proxyDeployCode)
+            )
             if iszero(addr) {
                 //if contract creation fails, we want to return any err messages
                 returndatacopy(0x00, 0x00, returndatasize())
@@ -102,14 +111,6 @@ abstract contract ProxyFactoryBase is DeterministicAddress, ProxyUpgrader {
     }
 
     /**
-     * @dev Sets a new implementation address
-     * @param newImplementationAddress_: address of the contract with the new implementation
-     */
-    function setImplementation(address newImplementationAddress_) public onlyOwnerOrDelegator {
-        _implementation = newImplementationAddress_;
-    }
-
-    /**
      * @dev Sets the new owner
      * @param newOwner_: address of the new owner
      */
@@ -118,20 +119,12 @@ abstract contract ProxyFactoryBase is DeterministicAddress, ProxyUpgrader {
     }
 
     /**
-     * @dev Sets the new delegator
-     * @param newDelegator_: address of the new delegator
-     */
-    function setDelegator(address newDelegator_) public onlyOwner {
-        _delegator = newDelegator_;
-    }
-
-    /**
-     * @dev lookup allows anyone interacting with the contract to get the address of contract specified
-     * by its name_
+     * @notice lookup allows anyone interacting with the contract to get the address of contract specified
+     * by its salt_
      * @param salt_: Custom NatSpec tag @custom:salt at the top of the contract solidity file
      */
-    function lookup(bytes32 salt_) public view returns (address addr) {
-        addr = getMetamorphicContractAddress(salt_, address(this));
+    function lookup(bytes32 salt_) public view virtual returns (address) {
+        return _lookup(salt_);
     }
 
     /**
@@ -147,14 +140,6 @@ abstract contract ProxyFactoryBase is DeterministicAddress, ProxyUpgrader {
      */
     function owner() public view returns (address owner_) {
         owner_ = _owner;
-    }
-
-    /**
-     * @dev delegator is public getter function for the _delegator account address
-     * @return delegator_ address of the delegator account
-     */
-    function delegator() public view returns (address delegator_) {
-        delegator_ = _delegator;
     }
 
     /**
@@ -186,31 +171,8 @@ abstract contract ProxyFactoryBase is DeterministicAddress, ProxyUpgrader {
         address target_,
         uint256 value_,
         bytes memory cdata_
-    ) internal {
-        assembly {
-            let size := mload(cdata_)
-            let ptr := add(0x20, cdata_)
-            if iszero(call(gas(), target_, value_, ptr, size, 0x00, 0x00)) {
-                returndatacopy(0x00, 0x00, returndatasize())
-                revert(0x00, returndatasize())
-            }
-        }
-    }
-
-    /**
-     * @dev _delegateCallAny allows EOA to call a function in a contract without impersonating the factory
-     * @param target_: the address of the contract to be called
-     * @param cdata_: Hex encoded data with function signature + arguments of the target function to be called
-     */
-    function _delegateCallAny(address target_, bytes memory cdata_) internal {
-        assembly {
-            let size := mload(cdata_)
-            let ptr := add(0x20, cdata_)
-            if iszero(delegatecall(gas(), target_, ptr, size, 0x00, 0x00)) {
-                returndatacopy(0x00, 0x00, returndatasize())
-                revert(0x00, returndatasize())
-            }
-        }
+    ) internal returns (bytes memory) {
+        return target_.functionCallWithValue(cdata_, value_);
     }
 
     /**
@@ -220,8 +182,10 @@ abstract contract ProxyFactoryBase is DeterministicAddress, ProxyUpgrader {
      * constructors' args (if any)
      * @return contractAddr the deployed contract address
      */
-    function _deployCreate(bytes calldata deployCode_) internal returns (address contractAddr) {
-        assembly {
+    function _deployCreate(
+        bytes calldata deployCode_
+    ) internal returns (address contractAddr) {
+        assembly ("memory-safe") {
             //get the next free pointer
             let basePtr := mload(0x40)
             let ptr := basePtr
@@ -234,9 +198,8 @@ abstract contract ProxyFactoryBase is DeterministicAddress, ProxyUpgrader {
 
             contractAddr := create(0, basePtr, sub(ptr, basePtr))
         }
-        require((_extCodeSize(contractAddr) != 0));
+        _codeSizeZeroRevert((_extCodeSize(contractAddr) != 0));
         emit DeployedRaw(contractAddr);
-        return contractAddr;
     }
 
     /**
@@ -266,18 +229,19 @@ abstract contract ProxyFactoryBase is DeterministicAddress, ProxyUpgrader {
 
             contractAddr := create2(value_, basePtr, sub(ptr, basePtr), salt_)
         }
-        require(uint160(contractAddr) != 0);
+        _codeSizeZeroRevert((_extCodeSize(contractAddr) != 0));
         //record the contract salt to the _contracts array for lookup
         _contracts.push(salt_);
         emit DeployedRaw(contractAddr);
-        return contractAddr;
     }
 
     /**
      * @dev _deployProxy deploys a proxy contract with upgradable logic. See Proxy.sol contract.
      * @param salt_ salt used to determine the final determinist address for the deployed contract
      */
-    function _deployProxy(bytes32 salt_) internal returns (address contractAddr) {
+    function _deployProxy(
+        bytes32 salt_
+    ) internal returns (address contractAddr) {
         address proxyTemplate = _proxyTemplate;
         assembly {
             // store proxy template address as implementation,
@@ -286,118 +250,15 @@ abstract contract ProxyFactoryBase is DeterministicAddress, ProxyUpgrader {
             mstore(0x40, add(ptr, 0x20))
             // put metamorphic code as initCode
             // push1 20
-            mstore(ptr, shl(72, 0x6020363636335afa1536363636515af43d36363e3d36f3))
+            mstore(
+                ptr,
+                shl(72, 0x6020363636335afa1536363636515af43d36363e3d36f3)
+            )
             contractAddr := create2(0, ptr, 0x17, salt_)
         }
-        require((_extCodeSize(contractAddr) != 0));
-        // record the contract salt to the contracts array
-        _contracts.push(salt_);
+        _codeSizeZeroRevert((_extCodeSize(contractAddr) != 0));
+        _addNewContract(salt_, contractAddr);
         emit DeployedProxy(contractAddr);
-        return contractAddr;
-    }
-
-    /**
-     * @dev _deployStatic finishes the deployment started with the deployTemplate of a contract with
-     * determinist address. This function call any initialize() function in the deployed contract
-     * in case the arguments are provided. Should be called after deployTemplate.
-     * @param salt_ salt used to determine the final determinist address for the deployed contract
-     * @param initCallData_ Hex encoded initialization function signature + parameters to initialize the deployed contract
-     * @return contractAddr the address of the deployed template contract
-     */
-    function _deployStatic(bytes32 salt_, bytes calldata initCallData_)
-        internal
-        returns (address contractAddr)
-    {
-        assembly {
-            // store proxy template address as implementation,
-            //sstore(_implementation.slot, _impl)
-            let ptr := mload(0x40)
-            mstore(0x40, add(ptr, 0x20))
-            // put metamorphic code as initcode
-            /*
-                00 60 PUSH1     20
-                02 36 CALLDATASIZE          20
-                03 36 CALLDATASIZE          0 | 20
-                04 36 CALLDATASIZE          0 | 0 | 20
-                05 33 CALLER                0 | 0 | 0 | 20
-                06 5a GAS                   CALLER | 0 | 0 | 0 | 20
-                07 fa STATICCALL            GAS | CALLER | 0 | 0 | 0 | 20
-                08 15 ISZERO                tmeplateaddress
-                09 36 CALLDATASIZE          0
-                0a 36 CALLDATASIZE          0 | 0
-                0b 36 CALLDATASIZE          0 | 0 | 0
-                0c 36 CALLDATASIZE          0 | 0 | 0 | 0
-                0d 51 MLOAD                 0 | 0 | 0 | 0 | 0
-                0e 5a GAS                   address | 0 | 0 | 0 | 0
-                0f f4 DELEGATECALL          GAS | address | 0 | 0 | 0 | 0
-                10 3d RETURNDATASIZE
-                11 36 CALLDATASIZE          RETURNDATASIZE
-                12 36 CALLDATASIZE
-                13 3e RETURNDATACOPY
-                14 3d RETURNDATASIZE
-                15 36 CALLDATASIZE
-                16 f3 RETURN
-            */
-            mstore(ptr, shl(72, 0x6020363636335afa1536363636515af43d36363e3d36f3))
-            contractAddr := create2(0, ptr, 0x17, salt_)
-            //if the returndatasize is not 0 revert with the error message
-            if iszero(iszero(returndatasize())) {
-                returndatacopy(0x00, 0x00, returndatasize())
-                revert(0, returndatasize())
-            }
-            //if contractAddr or code size at contractAddr is 0 revert with deploy fail message
-            if or(iszero(contractAddr), iszero(extcodesize(contractAddr))) {
-                mstore(0, "Static deploy failed")
-                revert(0, 0x20)
-            }
-        }
-        if (initCallData_.length > 0) {
-            _initializeContract(contractAddr, initCallData_);
-        }
-        require((_extCodeSize(contractAddr) != 0));
-        _contracts.push(salt_);
-        emit DeployedStatic(contractAddr);
-        return contractAddr;
-    }
-
-    /**
-     * @dev _deployTemplate deploys a template contract with the universal code copy constructor that
-     * deploys the contract+constructorArgs defined in the deployCode_ as the contracts runtime code.
-     * @param deployCode_ Hex encoded data with the deploymentCode + (constructor args appended if any)
-     * @return contractAddr the address of the deployed template contract
-     */
-    function _deployTemplate(bytes calldata deployCode_) internal returns (address contractAddr) {
-        assembly {
-            //get the next free pointer
-            let basePtr := mload(0x40)
-            mstore(0x40, add(basePtr, add(deployCode_.length, 0x28)))
-            let ptr := basePtr
-            //codesize, pc,  pc, codecopy, codesize, push1 09, return push2 <codesize> 56 5b
-            /*
-            00 38 codesize
-            01 58 pc            codesize
-            02 58 pc            01 | codesize
-            03 39 codecopy      02 | 01 | codesize
-            04 38 codesize
-            05 60 push1 09      codesize
-            07 f3 return        09 | codesize
-             */
-            mstore(ptr, hex"38585839386009f3")
-            //0x38585839386009f3
-            ptr := add(ptr, 0x08)
-            //copy the initialization code of the implementation contract
-            calldatacopy(ptr, deployCode_.offset, deployCode_.length)
-            // Move the ptr to the end of the code in memory
-            ptr := add(ptr, deployCode_.length)
-            // put address on constructor
-            mstore(ptr, address())
-            ptr := add(ptr, 0x20)
-            contractAddr := create(0, basePtr, sub(ptr, basePtr))
-        }
-        require((_extCodeSize(contractAddr) != 0));
-        emit DeployedTemplate(contractAddr);
-        _implementation = contractAddr;
-        return contractAddr;
     }
 
     /**
@@ -406,13 +267,26 @@ abstract contract ProxyFactoryBase is DeterministicAddress, ProxyUpgrader {
      * @param initCallData_ Hex encoded initialization function signature + parameters to initialize the
      * deployed contract
      */
-    function _initializeContract(address contract_, bytes calldata initCallData_) internal {
-        assembly {
+    function _initializeContract(
+        address contract_,
+        bytes calldata initCallData_
+    ) internal {
+        assembly ("memory-safe") {
             if iszero(iszero(initCallData_.length)) {
                 let ptr := mload(0x40)
                 mstore(0x40, add(initCallData_.length, ptr))
                 calldatacopy(ptr, initCallData_.offset, initCallData_.length)
-                if iszero(call(gas(), contract_, 0, ptr, initCallData_.length, 0x00, 0x00)) {
+                if iszero(
+                    call(
+                        gas(),
+                        contract_,
+                        0,
+                        ptr,
+                        initCallData_.length,
+                        0x00,
+                        0x00
+                    )
+                ) {
                     ptr := mload(0x40)
                     mstore(0x40, add(returndatasize(), ptr))
                     returndatacopy(ptr, 0x00, returndatasize())
@@ -423,16 +297,21 @@ abstract contract ProxyFactoryBase is DeterministicAddress, ProxyUpgrader {
     }
 
     /**
-     * @dev _multiCall allows EOA to make multiple function calls within a single transaction
+     * @notice _multiCall allows EOA to make multiple function calls within a single transaction
      * impersonating the factory
      * @param cdata_: array of abi encoded data with the function calls (function signature + arguments)
      */
-    function _multiCall(bytes[] calldata cdata_) internal {
+    function _multiCall(
+        MultiCallArgs[] calldata cdata_
+    ) internal returns (bytes[] memory results) {
+        results = new bytes[](cdata_.length);
         for (uint256 i = 0; i < cdata_.length; i++) {
-            bytes memory cdata = cdata_[i];
-            _callAny(address(this), 0, cdata);
+            results[i] = _callAny(
+                cdata_[i].target,
+                cdata_[i].value,
+                cdata_[i].data
+            );
         }
-        _returnAvailableData();
     }
 
     /**
@@ -447,29 +326,69 @@ abstract contract ProxyFactoryBase is DeterministicAddress, ProxyUpgrader {
         address newImpl_,
         bytes calldata initCallData_
     ) internal {
-        address proxy = DeterministicAddress.getMetamorphicContractAddress(salt_, address(this));
+        address proxy = DeterministicAddress.getMetamorphicContractAddress(
+            salt_,
+            address(this)
+        );
         __upgrade(proxy, newImpl_);
-        assert(IProxy(proxy).getImplementationAddress() == newImpl_);
+        address currentImplementation = __getProxyImplementation(proxy);
+        if (currentImplementation != newImpl_) {
+            revert IncorrectProxyImplementation(
+                currentImplementation,
+                newImpl_
+            );
+        }
         _initializeContract(proxy, initCallData_);
+        emit UpgradedProxy(salt_, proxy, newImpl_);
+    }
+
+    /// Internal function to add a new address and "pseudo" salt to the externalContractRegistry
+    function _addNewContract(
+        bytes32 salt_,
+        address newContractAddress_
+    ) internal {
+        if (_contractRegistry[salt_] != address(0)) {
+            revert SaltAlreadyInUse(salt_);
+        }
+        _contracts.push(salt_);
+        _contractRegistry[salt_] = newContractAddress_;
     }
 
     /**
-     * @dev Aux function to return the external code size
+     * @notice Aux function to return the external code size
      */
-    function _extCodeSize(address target_) internal view returns (uint256 size) {
-        assembly {
+    function _extCodeSize(
+        address target_
+    ) internal view returns (uint256 size) {
+        assembly ("memory-safe") {
             size := extcodesize(target_)
         }
         return size;
     }
 
+    // lookup allows anyone interacting with the contract to get the address of contract specified by
+    // its salt_. Returns address(0) in case a contract for that salt was not deployed.
+    function _lookup(bytes32 salt_) internal view returns (address) {
+        return _contractRegistry[salt_];
+    }
+
     /**
-     * @dev Aux function to get the return data size
+     * @notice _requireAuth reverts if false and returns unauthorized error message
+     * @param isOk_ boolean false to cause revert
      */
-    function _returnAvailableData() internal pure {
-        assembly {
-            returndatacopy(0x00, 0x00, returndatasize())
-            return(0x00, returndatasize())
+    function _requireAuth(bool isOk_) internal pure {
+        if (!isOk_) {
+            revert Unauthorized();
+        }
+    }
+
+    /**
+     * @notice _codeSizeZeroRevert reverts if false and returns csize0 error message
+     * @param isOk_ boolean false to cause revert
+     */
+    function _codeSizeZeroRevert(bool isOk_) internal pure {
+        if (!isOk_) {
+            revert CodeSizeZero();
         }
     }
 }
