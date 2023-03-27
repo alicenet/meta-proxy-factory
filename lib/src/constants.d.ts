@@ -1,0 +1,16 @@
+import "process";
+export declare const MULTICALL_GAS_LIMIT = "10000000";
+export declare const FUNCTION_INITIALIZE = "initialize";
+export declare const FUNCTION_DEPLOY_CREATE2 = "deployCreate2";
+export declare const FUNCTION_DEPLOY_CREATE = "deployCreate";
+export declare const FUNCTION_UPGRADE_PROXY = "upgradeProxy";
+export declare const EVENT_DEPLOYED_PROXY = "DeployedProxy";
+export declare const EVENT_DEPLOYED_RAW = "DeployedRaw";
+export declare const PROXY = "Proxy";
+export declare const CONTRACT_ADDR = "contractAddr";
+export declare const FACTORY_STATE_PATH = "../scripts/generated/factoryState";
+export declare const LOGIC_ADDR = "LogicAddress";
+export declare const ONLY_PROXY = "onlyProxy";
+export declare const PROXY_ADDR = "ProxyAddress";
+export declare const UPGRADEABLE_DEPLOYMENT: string;
+export declare const CREATE_AND_REGISTER_DEPLOYMENT: string;

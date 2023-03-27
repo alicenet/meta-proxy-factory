@@ -1,11 +1,19 @@
 import {
+    BigNumber,
     BytesLike,
     Contract,
-    ContractTransaction
+    ContractFactory,
+    ContractTransaction,
+    Overrides
 } from "ethers";
 import { isHexString } from "ethers/lib/utils";
+import {ProxyFactory} from "../typechain-types";
 const proxyFactoryArtifact = require("../artifacts/contracts/ProxyFactory.sol/ProxyFactory.json");
-
+import {ethers} from "hardhat";
+import { PromiseOrValue } from "../typechain-types/common";
+import { encodeMultiCallDeployUpgradeableArgs, MultiCallGasError } from "./proxyFactory";
+import { MULTICALL_GAS_LIMIT } from "./constants";
+type Ethers = typeof ethers;
 export const deployUpgradeableWithFactory = async (
     factory: Contract,
     contractName: string,
@@ -69,6 +77,52 @@ export const deployUpgradeableWithFactory = async (
         await getContractAddressFromDeployedProxyEvent(transaction2)
     );
 };
+
+// multicall deploy logic, proxy, and upgrade proxy
+/**
+ * @description uses multicall to deploy logic contract with deployCreate, deploys proxy with deployProxy, and upgrades proxy with upgradeProxy
+ * @dev since upgradeable contracts go through proxies, constructor args can only be used to set immutable variables
+ * this function will fail if gas cost exceeds 10 million gas units
+ * @param implementationBase ethers contract factory for the implementation contract
+ * @param factory an instance of a deployed and connected factory
+ * @param ethers ethers object
+ * @param initCallData encoded initialization call data for contracts with a initialize function
+ * @param constructorArgs a list of arguements to pass to the constructor of the implementation contract, only for immutable variables
+ * @param salt bytes32 formatted salt used for deploycreate2 and to reference the contract in lookup
+ * @param overrides
+ * @returns a promise that resolves to the deployed contracts
+ */
+export async function multiCallDeployUpgradeable(
+    implementationBase: ContractFactory,
+    factory: ProxyFactory,
+    ethers: Ethers,
+    initCallData: string,
+    constructorArgs: any[] = [],
+    salt: string,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction> {
+    const multiCallArgs = await encodeMultiCallDeployUpgradeableArgs(
+      implementationBase,
+      factory,
+      ethers,
+      initCallData,
+      constructorArgs,
+      salt
+    );
+    const estimatedMultiCallGas = await factory.estimateGas.multiCall(
+      multiCallArgs
+    );
+    if (estimatedMultiCallGas.gt(BigNumber.from(MULTICALL_GAS_LIMIT))) {
+      throw new MultiCallGasError(
+        `estimatedGasCost ${estimatedMultiCallGas.toString()} exceeds MULTICALL_GAS_LIMIT ${MULTICALL_GAS_LIMIT}`
+      );
+    }
+    if (overrides === undefined) {
+      return factory.multiCall(multiCallArgs);
+    } else {
+      return factory.multiCall(multiCallArgs, overrides);
+    }
+  }
 
 export const getContractAddressFromDeployedRawEvent = async (
     tx: ContractTransaction

@@ -11,6 +11,8 @@
     "declaration": true
   },
   "include": [
-    "src"
-  ]
+    "./src",
+    "./typechain-types/**/*",
+  ],
+  "files": ["./hardhat.config.ts"]
 }
