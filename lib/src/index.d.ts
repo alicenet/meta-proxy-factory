@@ -1,6 +1,6 @@
 import { Contract, ContractTransaction } from "ethers";
 export { Factory } from "./proxyFactory";
-export declare const deployUpgradeableProxyWithFactory: (factory: Contract, contractName: string, salt?: string, initCallData?: any[], constructorArgs?: any[]) => Promise<Contract>;
+export declare const deployUpgradeableWithFactory: (factory: Contract, contractName: string, salt?: string, initCallData?: any[], constructorArgs?: any[]) => Promise<Contract>;
 export declare const getContractAddressFromDeployedRawEvent: (tx: ContractTransaction) => Promise<string>;
 export declare const getContractAddressFromEventLog: (tx: ContractTransaction, eventSignature: string, eventName: string) => Promise<string>;
 export declare const getBytes32Salt: (contractName: string) => any;
