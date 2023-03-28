@@ -5,8 +5,6 @@ import {
 } from "ethers";
 import { isHexString } from "ethers/lib/utils";
 const proxyFactoryArtifact = require("../artifacts/contracts/ProxyFactory.sol/ProxyFactory.json");
-import { ethers } from "hardhat";
-type Ethers = typeof ethers;
 export { Factory } from "./proxyFactory";
 export const deployUpgradeableWithFactory = async (
     factory: Contract,

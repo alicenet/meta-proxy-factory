@@ -2,14 +2,23 @@
     "version": "0.1.0",
     "name": "meta-proxy-factory",
     "main": "lib/src/index.js",
+    "types": "lib/src/index.d.ts",
     "scripts": {
         "prepare": "npm run build",
-        "build": "tsc",
+        "build": "tsc --build .",
         "node": "npx hardhat node --port 8585",
         "test": "npx hardhat test",
         "compile": "npx hardhat compile",
         "abi": "npx hardhat export-abi"
     },
+    "files": [
+        "*.d.ts",
+        "*.d.ts.map",
+        "*.js",
+        "*.js.map",
+        "LICENSE",
+        "README.md"
+    ],
     "devDependencies": {
         "@nomicfoundation/hardhat-network-helpers": "^1.0.8",
         "@nomiclabs/hardhat-ethers": "^2.0.4",

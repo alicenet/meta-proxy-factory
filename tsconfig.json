@@ -10,14 +10,9 @@
     "resolveJsonModule": true,
     "declaration": true
   },
-  "exclude": [
-    "node_modules",
-    "lib",
-    "typechain-types"
-  ],
   "include": [
-    "src"
-    // "typechain-types/**/*",
+    "./src",
+    "./typechain-types/**/*",
   ],
   "files": [
     "hardhat.config.ts"

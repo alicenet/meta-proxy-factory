@@ -21,12 +21,3 @@ export const ONLY_PROXY = "onlyProxy";
 export const PROXY_ADDR = "ProxyAddress";
 export const UPGRADEABLE_DEPLOYMENT: string = "deployUpgradeable";
 export const CREATE_AND_REGISTER_DEPLOYMENT: string = "deployCreateAndRegister";
-
-// default paths
-// export const env = (): string => {
-//   let _env = process.env.DEPLOYMENT_ENVIRONMENT;
-//   if (typeof _env === "undefined") {
-//     _env = "dev";
-//   }
-//   return _env;
-// };
