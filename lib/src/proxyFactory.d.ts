@@ -127,13 +127,13 @@ export declare class Factory {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     /**
-  * @param contract name of the contract to deploy, or a contract factory
-  * @param factory instance of deployed and connected ProxyFactory
-  * @param ethers ethers js object
-  * @param constructorArgs constructor arguments for the implementation contract
-  * @param overrides
-  * @returns a promise that resolves to a transaction response
-  */
+     * @param contract name of the contract to deploy, or a contract factory
+     * @param factory instance of deployed and connected ProxyFactory
+     * @param ethers ethers js object
+     * @param constructorArgs constructor arguments for the implementation contract
+     * @param overrides
+     * @returns a promise that resolves to a transaction response
+     */
     deployCreate(contract: string | ContractFactory, constructorArgs?: any[], overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
@@ -141,15 +141,15 @@ export declare class Factory {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     /**
-  * @description deploys logic contract with deployCreate, then multiCalls deployProxy and upgradeProxy
-  * @param contract name of the contract to deploy, or a contract factory
-  * @param initCallData encoded call data for the initialize function of the implementation contract
-  * @param constructorArgs constructor arguments for the implementation contract
-  * @param salt bytes32 formatted salt used to deploy the proxy
-  * @param waitConfirmation number of confirmations to wait for before returning the transaction
-  * @param overrides
-  * @returns
-  */
+     * @description deploys logic contract with deployCreate, then multiCalls deployProxy and upgradeProxy
+     * @param contract name of the contract to deploy, or a contract factory
+     * @param initCallData encoded call data for the initialize function of the implementation contract
+     * @param constructorArgs constructor arguments for the implementation contract
+     * @param salt bytes32 formatted salt used to deploy the proxy
+     * @param waitConfirmation number of confirmations to wait for before returning the transaction
+     * @param overrides
+     * @returns
+     */
     deployUpgradeable(contract: string | ContractFactory, initCallData: string, constructorArgs: Array<string>, salt: string, waitConfirmation?: number, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
@@ -185,12 +185,12 @@ export declare class Factory {
      */
     getEventVar(receipt: ContractReceipt, eventName: string, varName: string): string;
     /**
-  *
-  * @param factoryAddress address of the factory that deployed the contract
-  * @param salt value specified by custom:salt in the contrac
-  * @param ethers ethersjs object
-  * @returns returns the address of the metamorphic contract deployed with the following metamorphic code "0x6020363636335afa1536363636515af43d36363e3d36f3"
-  */
+     *
+     * @param factoryAddress address of the factory that deployed the contract
+     * @param salt value specified by custom:salt in the contrac
+     * @param ethers ethersjs object
+     * @returns returns the address of the metamorphic contract deployed with the following metamorphic code "0x6020363636335afa1536363636515af43d36363e3d36f3"
+     */
     getMetamorphicAddress(factoryAddress: string, salt: string): Promise<string>;
 }
 export {};
