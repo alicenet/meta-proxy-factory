@@ -1,5 +1,5 @@
-import { Signer, ContractFactory, Overrides } from "ethers";
 import type { Provider, TransactionRequest } from "@ethersproject/providers";
+import { ContractFactory, Overrides, Signer } from "ethers";
 import type { PromiseOrValue } from "../common";
 import type { ProxyChild, ProxyChildInterface } from "../ProxyChild";
 type ProxyChildConstructorParams = [signer?: Signer] | ConstructorParameters<typeof ContractFactory>;

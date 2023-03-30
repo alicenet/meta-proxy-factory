@@ -2,11 +2,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { ethers } from "ethers";
 import {
   FactoryOptions,
   HardhatEthersHelpers as HardhatEthersHelpersBase,
 } from "@nomiclabs/hardhat-ethers/types";
+import { ethers } from "ethers";
 
 import * as Contracts from ".";
 

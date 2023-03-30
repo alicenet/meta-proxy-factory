@@ -1,5 +1,5 @@
-import { Signer } from "ethers";
 import type { Provider } from "@ethersproject/providers";
+import { Signer } from "ethers";
 import type { ProxyFactoryBase, ProxyFactoryBaseInterface } from "../ProxyFactoryBase";
 export declare class ProxyFactoryBase__factory {
     static readonly abi: readonly [{

@@ -96,6 +96,17 @@ export declare class Factory {
     encodeMultiCallUpgradeProxyArgs(implementationBase: ContractFactory, initCallData: string, constructorArgs: any[] | undefined, salt: string): Promise<MultiCallArgsStruct[]>;
     encodeMultiCallArgs(targetAddress: string, value: BigNumberish, callData: BytesLike): MultiCallArgsStruct;
     calculateDeployCreateAddress(deployerAddress: string): Promise<string>;
+    /**
+     * @description deploys a upgradeable contract with proxy factory, deploys logic, deploys proxy, upgrades proxy, and initializes proxy.
+     * attempts to deploy with 1 multicall, if it fails, it deploys logic as a separate transaction, and then deploys proxy and upgrades proxy with a multicall
+     * @param contractName name of contract to deploy
+     * @param initCallData encoded initialize calldata
+     * @param constructorArgs: constructor arguments if any, only for immutable variables
+     * @param salt bytes32 formatted salt used for deploycreate2 and to reference the contract in lookup
+     * @param waitConfirmantions number of confirmations to wait for before returning
+     * @param overrides call data overrrides
+     * @returns
+     */
     deployUpgradeableGasSafe(contractName: string, initCallData: string, constructorArgs: any[], salt: string, waitConfirmantions?: number, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;

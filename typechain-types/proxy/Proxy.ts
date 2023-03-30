@@ -5,11 +5,10 @@ import type { BaseContract, Signer, utils } from "ethers";
 
 import type { Listener, Provider } from "@ethersproject/providers";
 import type {
-  TypedEventFilter,
-  TypedEvent,
-  TypedListener,
   OnEvent,
-  PromiseOrValue,
+  TypedEvent,
+  TypedEventFilter,
+  TypedListener,
 } from "../common";
 
 export interface ProxyInterface extends utils.Interface {

@@ -1,5 +1,5 @@
-import { Signer } from "ethers";
 import type { Provider } from "@ethersproject/providers";
+import { Signer } from "ethers";
 import type { DeterministicAddress, DeterministicAddressInterface } from "../DeterministicAddress";
 export declare class DeterministicAddress__factory {
     static readonly abi: readonly [{

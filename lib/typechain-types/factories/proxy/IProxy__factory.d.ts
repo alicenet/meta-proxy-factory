@@ -1,5 +1,5 @@
-import { Signer } from "ethers";
 import type { Provider } from "@ethersproject/providers";
+import { Signer } from "ethers";
 import type { IProxy, IProxyInterface } from "../../proxy/IProxy";
 export declare class IProxy__factory {
     static readonly abi: readonly [{

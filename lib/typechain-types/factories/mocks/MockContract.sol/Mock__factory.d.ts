@@ -1,5 +1,5 @@
-import { Signer, ContractFactory, BigNumberish, Overrides } from "ethers";
 import type { Provider, TransactionRequest } from "@ethersproject/providers";
+import { BigNumberish, ContractFactory, Overrides, Signer } from "ethers";
 import type { PromiseOrValue } from "../../../common";
 import type { Mock, MockInterface } from "../../../mocks/MockContract.sol/Mock";
 type MockConstructorParams = [signer?: Signer] | ConstructorParameters<typeof ContractFactory>;
