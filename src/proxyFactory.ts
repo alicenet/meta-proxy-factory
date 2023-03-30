@@ -329,7 +329,17 @@ export class Factory {
             nonce: factoryNonce,
         });
     }
-
+    /**
+     * @description deploys a upgradeable contract with proxy factory, deploys logic, deploys proxy, upgrades proxy, and initializes proxy.
+     * attempts to deploy with 1 multicall, if it fails, it deploys logic as a separate transaction, and then deploys proxy and upgrades proxy with a multicall
+     * @param contractName name of contract to deploy
+     * @param initCallData encoded initialize calldata
+     * @param constructorArgs: constructor arguments if any, only for immutable variables
+     * @param salt bytes32 formatted salt used for deploycreate2 and to reference the contract in lookup
+     * @param waitConfirmantions number of confirmations to wait for before returning
+     * @param overrides call data overrrides
+     * @returns 
+     */
     async deployUpgradeableGasSafe(
         contractName: string,
         initCallData: string,
