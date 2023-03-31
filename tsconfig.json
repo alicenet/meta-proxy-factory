@@ -14,6 +14,7 @@
     "./test",
     "./scripts",
     "./contracts",
+    "./artifacts/**/*",
     "./typechain-types/**/*",
     "**/*.ts",
     "./decs.d.ts",
