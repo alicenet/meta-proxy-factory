@@ -330,6 +330,11 @@ export class Factory {
     return output;
   }
 
+  /**
+   * @description calculates the address of a contract deployed with deployCreate
+   * @param deployerAddress address of the deployer
+   * @returns
+   */
   async calculateDeployCreateAddress(deployerAddress: string) {
     const factoryNonce = await this.ethers.provider.getTransactionCount(
       deployerAddress
@@ -337,6 +342,20 @@ export class Factory {
     return this.ethers.utils.getContractAddress({
       from: deployerAddress,
       nonce: factoryNonce,
+    });
+  }
+  /**
+   * @description calculates the address of a contract deployed with deployCreate
+   * @param deployerAddress address of the deployer
+   * @returns
+   */
+  async calculateDeployCreate2Address(deployerAddress: string, salt: string) {
+    const factoryNonce = await this.ethers.provider.getTransactionCount(
+      deployerAddress
+    );
+    return this.ethers.utils.getCreate2Address({
+      from: deployerAddress,
+      salt: factoryNonce,
     });
   }
   /**
@@ -629,18 +648,17 @@ export class Factory {
   }
 
   /**
-   *
+   * @description calculates the address of a contract deployed with the following metamorphic code "0x6020363636335afa1536363636515af43d36363e3d36f3"
    * @param factoryAddress address of the factory that deployed the contract
-   * @param salt value specified by custom:salt in the contrac
+   * @param salt string none hex formatted salt used to deploy the contract
    * @param ethers ethersjs object
    * @returns returns the address of the metamorphic contract deployed with the following metamorphic code "0x6020363636335afa1536363636515af43d36363e3d36f3"
    */
-  async getMetamorphicAddress(factoryAddress: string, salt: string) {
-    const factory = await this.getFactory();
+  async CalculateDeployCreate2Address(factoryAddress: string, salt: string) {
     const initCode = "0x6020363636335afa1536363636515af43d36363e3d36f3";
     return this.ethers.utils.getCreate2Address(
-      factory.address,
-      salt,
+      factoryAddress,
+      this.ethers.utils.formatBytes32String(salt),
       this.ethers.utils.keccak256(initCode)
     );
   }
