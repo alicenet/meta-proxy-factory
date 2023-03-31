@@ -12,7 +12,7 @@
         "abi": "npx hardhat export-abi"
     },
     "files": [
-        "./artifacts/**/*",
+        "lib/artifacts/**/*",
         "*.d.ts.map",
         "*.js",
         "*.js.map",
