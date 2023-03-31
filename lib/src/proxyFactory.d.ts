@@ -95,7 +95,20 @@ export declare class Factory {
      */
     encodeMultiCallUpgradeProxyArgs(implementationBase: ContractFactory, initCallData: string, constructorArgs: any[] | undefined, salt: string): Promise<MultiCallArgsStruct[]>;
     encodeMultiCallArgs(targetAddress: string, value: BigNumberish, callData: BytesLike): MultiCallArgsStruct;
+    /**
+     * @description calculates the address of a contract deployed with deployCreate
+     * @param deployerAddress address of the deployer
+     * @returns
+     */
     calculateDeployCreateAddress(deployerAddress: string): Promise<string>;
+    /**
+     * @description calculates the address of a contract deployed with the following metamorphic code "0x6020363636335afa1536363636515af43d36363e3d36f3"
+     * @param factoryAddress address of the factory that deployed the contract
+     * @param salt string none hex formatted salt used to deploy the contract
+     * @param ethers ethersjs object
+     * @returns returns the address of the metamorphic contract deployed with the following metamorphic code "0x6020363636335afa1536363636515af43d36363e3d36f3"
+     */
+    CalculateDeployCreate2Address(factoryAddress: string, salt: string): Promise<string>;
     /**
      * @description deploys a upgradeable contract with proxy factory, deploys logic, deploys proxy, upgrades proxy, and initializes proxy.
      * attempts to deploy with 1 multicall, if it fails, it deploys logic as a separate transaction, and then deploys proxy and upgrades proxy with a multicall
@@ -184,13 +197,5 @@ export declare class Factory {
      * @returns
      */
     getEventVar(receipt: ContractReceipt, eventName: string, varName: string): string;
-    /**
-     *
-     * @param factoryAddress address of the factory that deployed the contract
-     * @param salt value specified by custom:salt in the contrac
-     * @param ethers ethersjs object
-     * @returns returns the address of the metamorphic contract deployed with the following metamorphic code "0x6020363636335afa1536363636515af43d36363e3d36f3"
-     */
-    getMetamorphicAddress(factoryAddress: string, salt: string): Promise<string>;
 }
 export {};

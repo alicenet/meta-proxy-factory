@@ -344,20 +344,23 @@ export class Factory {
       nonce: factoryNonce,
     });
   }
+
   /**
-   * @description calculates the address of a contract deployed with deployCreate
-   * @param deployerAddress address of the deployer
-   * @returns
+   * @description calculates the address of a contract deployed with the following metamorphic code "0x6020363636335afa1536363636515af43d36363e3d36f3"
+   * @param factoryAddress address of the factory that deployed the contract
+   * @param salt string none hex formatted salt used to deploy the contract
+   * @param ethers ethersjs object
+   * @returns returns the address of the metamorphic contract deployed with the following metamorphic code "0x6020363636335afa1536363636515af43d36363e3d36f3"
    */
-  async calculateDeployCreate2Address(deployerAddress: string, salt: string) {
-    const factoryNonce = await this.ethers.provider.getTransactionCount(
-      deployerAddress
+  async CalculateDeployCreate2Address(factoryAddress: string, salt: string) {
+    const initCode = "0x6020363636335afa1536363636515af43d36363e3d36f3";
+    return this.ethers.utils.getCreate2Address(
+      factoryAddress,
+      this.ethers.utils.formatBytes32String(salt),
+      this.ethers.utils.keccak256(initCode)
     );
-    return this.ethers.utils.getCreate2Address({
-      from: deployerAddress,
-      salt: factoryNonce,
-    });
   }
+
   /**
    * @description deploys a upgradeable contract with proxy factory, deploys logic, deploys proxy, upgrades proxy, and initializes proxy.
    * attempts to deploy with 1 multicall, if it fails, it deploys logic as a separate transaction, and then deploys proxy and upgrades proxy with a multicall
@@ -645,21 +648,5 @@ export class Factory {
       }
     }
     throw new Error(`failed to find event: ${eventName}`);
-  }
-
-  /**
-   * @description calculates the address of a contract deployed with the following metamorphic code "0x6020363636335afa1536363636515af43d36363e3d36f3"
-   * @param factoryAddress address of the factory that deployed the contract
-   * @param salt string none hex formatted salt used to deploy the contract
-   * @param ethers ethersjs object
-   * @returns returns the address of the metamorphic contract deployed with the following metamorphic code "0x6020363636335afa1536363636515af43d36363e3d36f3"
-   */
-  async CalculateDeployCreate2Address(factoryAddress: string, salt: string) {
-    const initCode = "0x6020363636335afa1536363636515af43d36363e3d36f3";
-    return this.ethers.utils.getCreate2Address(
-      factoryAddress,
-      this.ethers.utils.formatBytes32String(salt),
-      this.ethers.utils.keccak256(initCode)
-    );
   }
 }
