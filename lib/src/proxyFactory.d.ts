@@ -16,6 +16,7 @@ export declare class Factory {
     ethers: Ethers;
     private _initialized;
     constructor(ethers: Ethers, factoryAddress?: string);
+    initialized(): boolean;
     getFactory(): Promise<ProxyFactory>;
     deploy(overrides?: Overrides & {
         from?: PromiseOrValue<string>;
