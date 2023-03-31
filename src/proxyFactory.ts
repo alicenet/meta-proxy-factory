@@ -353,7 +353,6 @@ export class Factory {
    * @description calculates the address of a contract deployed with the following metamorphic code "0x6020363636335afa1536363636515af43d36363e3d36f3"
    * @param factoryAddress address of the factory that deployed the contract
    * @param salt string none hex formatted salt used to deploy the contract
-   * @param ethers ethersjs object
    * @returns returns the address of the metamorphic contract deployed with the following metamorphic code "0x6020363636335afa1536363636515af43d36363e3d36f3"
    */
   async CalculateDeployCreate2Address(factoryAddress: string, salt: string) {
