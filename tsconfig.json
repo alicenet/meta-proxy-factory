@@ -19,7 +19,5 @@
     "./decs.d.ts",
     "./utils"
   ],
-  "files": [
-    "hardhat.config.ts"
-  ]
+  "files": ["hardhat.config.ts"]
 }

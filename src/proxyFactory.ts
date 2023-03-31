@@ -9,6 +9,7 @@ import {
   Overrides,
 } from "ethers";
 import { ethers } from "hardhat";
+import proxyFactoryArtifact from "../artifacts/contracts/ProxyFactory.sol/ProxyFactory.json";
 import { ProxyFactory } from "../typechain-types";
 import { PromiseOrValue } from "../typechain-types/common";
 import {
@@ -16,7 +17,6 @@ import {
   EVENT_DEPLOYED_RAW,
   MULTICALL_GAS_LIMIT,
 } from "./constants";
-const proxyFactoryArtifact = require("../artifacts/contracts/ProxyFactory.sol/ProxyFactory.json");
 type Ethers = typeof ethers;
 export type MultiCallArgsStruct = {
   target: string;
@@ -39,7 +39,7 @@ export class Factory {
     if (factoryAddress !== undefined) {
       this.factory = new ethers.Contract(
         factoryAddress,
-        proxyFactoryArtifact,
+        proxyFactoryArtifact.abi,
         ethers.provider
       );
     } else {
