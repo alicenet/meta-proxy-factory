@@ -50,7 +50,9 @@ export class Factory {
       );
     }
   }
-
+  initialized() {
+    return this._initialized;
+  }
   async getFactory() {
     if (this._initialized) {
       return this.factory as ProxyFactory;
