@@ -13,6 +13,7 @@
     },
     "files": [
         "lib/artifacts/**/*",
+        "lib/src/proxyFactory.js",
         "*.d.ts.map",
         "*.js",
         "*.js.map",
