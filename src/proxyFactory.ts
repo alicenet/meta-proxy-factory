@@ -52,6 +52,10 @@ export class Factory {
   }
 
   initialized() {
+    if (this.factory.address === this.ethers.constants.AddressZero) {
+      this._initialized = false;
+      return this._initialized;
+    }
     return this._initialized;
   }
 
