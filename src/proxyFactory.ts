@@ -80,7 +80,7 @@ export class Factory {
   }
   async init() {
     if (this.factory.address === this.ethers.constants.AddressZero) {
-      this.deploy();
+      await this.deploy();
     } else {
       this.factory = await this.ethers.getContractAtFromArtifact(
         proxyFactoryArtifact,
