@@ -58,13 +58,10 @@ export class Factory {
   async getFactory() {
     if (this._initialized) {
       return this.factory as ProxyFactory;
-    } else if (this.factory.address !== this.ethers.constants.AddressZero) {
-      await this.init();
-      return this.factory as ProxyFactory;
     } else {
-      await this.deploy();
-      return this.factory as ProxyFactory;
+      await this.init();
     }
+    return this.factory as ProxyFactory;
   }
   async deploy(overrides?: Overrides & { from?: PromiseOrValue<string> }) {
     let factoryBase = await this.ethers.getContractFactoryFromArtifact(
@@ -78,10 +75,14 @@ export class Factory {
     this._initialized = true;
   }
   async init() {
-    this.factory = await this.ethers.getContractAtFromArtifact(
-      proxyFactoryArtifact,
-      this.factory.address
-    );
+    if (this.factory.address === this.ethers.constants.AddressZero) {
+      this.deploy();
+    } else {
+      this.factory = await this.ethers.getContractAtFromArtifact(
+        proxyFactoryArtifact,
+        this.factory.address
+      );
+    }
     this._initialized = true;
   }
   async changeFactory(factoryAddress: string) {
