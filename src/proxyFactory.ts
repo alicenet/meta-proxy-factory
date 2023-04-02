@@ -37,16 +37,16 @@ export class Factory {
   constructor(ethers: Ethers, factoryAddress?: string) {
     this.ethers = ethers;
     if (factoryAddress !== undefined) {
-      this.factory = new ethers.Contract(
+      this.factory = new this.ethers.Contract(
         factoryAddress,
         proxyFactoryArtifact.abi,
-        ethers.provider
+        this.ethers.provider
       );
     } else {
-      this.factory = new ethers.Contract(
-        ethers.constants.AddressZero,
+      this.factory = new this.ethers.Contract(
+        this.ethers.constants.AddressZero,
         proxyFactoryArtifact.abi,
-        ethers.provider
+        this.ethers.provider
       );
     }
   }
@@ -67,7 +67,7 @@ export class Factory {
     }
   }
   async deploy(overrides?: Overrides & { from?: PromiseOrValue<string> }) {
-    let factoryBase = await ethers.getContractFactoryFromArtifact(
+    let factoryBase = await this.ethers.getContractFactoryFromArtifact(
       proxyFactoryArtifact
     );
     if (overrides === undefined) {
@@ -78,14 +78,14 @@ export class Factory {
     this._initialized = true;
   }
   async init() {
-    this.factory = await ethers.getContractAtFromArtifact(
+    this.factory = await this.ethers.getContractAtFromArtifact(
       proxyFactoryArtifact,
       this.factory.address
     );
     this._initialized = true;
   }
   async changeFactory(factoryAddress: string) {
-    this.factory = await ethers.getContractAtFromArtifact(
+    this.factory = await this.ethers.getContractAtFromArtifact(
       proxyFactoryArtifact,
       factoryAddress
     );
@@ -97,8 +97,6 @@ export class Factory {
    * @dev since upgradeable contracts go through proxies, constructor args can only be used to set immutable variables
    * this function will fail if gas cost exceeds 10 million gas units
    * @param implementationBase ethers contract factory for the implementation contract
-   * @param factory an instance of a deployed and connected factory
-   * @param ethers ethers object
    * @param initCallData encoded initialization call data for contracts with a initialize function
    * @param constructorArgs a list of arguements to pass to the constructor of the implementation contract, only for immutable variables
    * @param salt bytes32 formatted salt used for deploycreate2 and to reference the contract in lookup
@@ -412,8 +410,6 @@ export class Factory {
    * @description attempts to upgrade a proxy using a multicall deploycreate and upgradeProxy,
    * if the gas is too high, it will deploy the implementation contract and upgrade the proxy with 2 separate calls
    * @param contractName name of the contract to deploy
-   * @param factory connected instance of ProxyFactory
-   * @param ethers instance of ethers js
    * @param initCallData encoded inititalize call data
    * @param constructorArgs constructor arguments (can only be used for immutable variables)
    * @param salt bytes32 formatted salt used to deploy the proxy
@@ -423,8 +419,6 @@ export class Factory {
    */
   async upgradeProxyGasSafe(
     contractName: string,
-
-    ethers: Ethers,
     initCallData: string,
     constructorArgs: any[],
     salt: string,
@@ -464,8 +458,6 @@ export class Factory {
 
   /**
    * @param contract name of the contract to deploy, or a contract factory
-   * @param factory instance of deployed and connected ProxyFactory
-   * @param ethers ethers js object
    * @param constructorArgs constructor arguments for the implementation contract
    * @param overrides
    * @returns a promise that resolves to a transaction response

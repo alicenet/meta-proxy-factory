@@ -28,8 +28,6 @@ export declare class Factory {
      * @dev since upgradeable contracts go through proxies, constructor args can only be used to set immutable variables
      * this function will fail if gas cost exceeds 10 million gas units
      * @param implementationBase ethers contract factory for the implementation contract
-     * @param factory an instance of a deployed and connected factory
-     * @param ethers ethers object
      * @param initCallData encoded initialization call data for contracts with a initialize function
      * @param constructorArgs a list of arguements to pass to the constructor of the implementation contract, only for immutable variables
      * @param salt bytes32 formatted salt used for deploycreate2 and to reference the contract in lookup
@@ -127,8 +125,6 @@ export declare class Factory {
      * @description attempts to upgrade a proxy using a multicall deploycreate and upgradeProxy,
      * if the gas is too high, it will deploy the implementation contract and upgrade the proxy with 2 separate calls
      * @param contractName name of the contract to deploy
-     * @param factory connected instance of ProxyFactory
-     * @param ethers instance of ethers js
      * @param initCallData encoded inititalize call data
      * @param constructorArgs constructor arguments (can only be used for immutable variables)
      * @param salt bytes32 formatted salt used to deploy the proxy
@@ -136,13 +132,11 @@ export declare class Factory {
      * @param overrides
      * @returns
      */
-    upgradeProxyGasSafe(contractName: string, ethers: Ethers, initCallData: string, constructorArgs: any[], salt: string, waitConfirmations?: number, overrides?: Overrides & {
+    upgradeProxyGasSafe(contractName: string, initCallData: string, constructorArgs: any[], salt: string, waitConfirmations?: number, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
     /**
      * @param contract name of the contract to deploy, or a contract factory
-     * @param factory instance of deployed and connected ProxyFactory
-     * @param ethers ethers js object
      * @param constructorArgs constructor arguments for the implementation contract
      * @param overrides
      * @returns a promise that resolves to a transaction response
