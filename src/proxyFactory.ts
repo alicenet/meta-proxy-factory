@@ -39,7 +39,7 @@ export class Factory {
     this._initialized = this.init(factoryAddress);
   }
 
-  async init(factoryAddress?: string): Promise<void> {
+  private async init(factoryAddress?: string): Promise<void> {
     if (factoryAddress === undefined) {
       this.factory = (await this.deploy(factoryAddress)) as ProxyFactory;
     } else {
