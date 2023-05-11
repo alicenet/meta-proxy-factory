@@ -1,4 +1,4 @@
-import { BigNumberish, BytesLike, Contract, ContractFactory, ContractReceipt, ContractTransaction, Overrides } from "ethers";
+import { BigNumberish, BytesLike, ContractFactory, ContractReceipt, ContractTransaction, Overrides } from "ethers";
 import { ethers } from "hardhat";
 import { ProxyFactory } from "../typechain-types";
 import { PromiseOrValue } from "../typechain-types/common";
@@ -12,16 +12,17 @@ export declare class MultiCallGasError extends Error {
     constructor(message: string);
 }
 export declare class Factory {
-    factory: ProxyFactory | Contract;
+    private factory;
     ethers: Ethers;
+    initialized: boolean;
     private _initialized;
     constructor(ethers: Ethers, factoryAddress?: string);
-    initialized(): boolean;
+    init(factoryAddress?: string): Promise<void>;
+    isInitialized(): Promise<boolean>;
     getFactory(): Promise<ProxyFactory>;
     deploy(overrides?: Overrides & {
         from?: PromiseOrValue<string>;
-    }): Promise<void>;
-    init(): Promise<void>;
+    }): Promise<import("ethers").Contract>;
     changeFactory(factoryAddress: string): Promise<void>;
     /**
      * @description uses multicall to deploy logic contract with deployCreate, deploys proxy with deployProxy, and upgrades proxy with upgradeProxy
