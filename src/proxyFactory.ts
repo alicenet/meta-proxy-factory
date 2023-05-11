@@ -2,7 +2,6 @@ import {
   BigNumber,
   BigNumberish,
   BytesLike,
-  Contract,
   ContractFactory,
   ContractReceipt,
   ContractTransaction,
@@ -31,40 +30,25 @@ export class MultiCallGasError extends Error {
 }
 
 export class Factory {
-  factory: ProxyFactory | Contract;
+  factory!: ProxyFactory;
   ethers: Ethers;
-  private _initialized: boolean = false;
   constructor(ethers: Ethers, factoryAddress?: string) {
     this.ethers = ethers;
-    if (factoryAddress !== undefined) {
-      this.factory = new this.ethers.Contract(
-        factoryAddress,
-        proxyFactoryArtifact.abi,
-        this.ethers.provider
-      );
-    } else {
-      this.factory = new this.ethers.Contract(
-        this.ethers.constants.AddressZero,
-        proxyFactoryArtifact.abi,
-        this.ethers.provider
-      );
-    }
+    this.init(factoryAddress);
   }
 
-  initialized() {
-    if (this.factory.address === this.ethers.constants.AddressZero) {
-      this._initialized = false;
-      return this._initialized;
+  async init(factoryAddress?: string) {
+    if (factoryAddress === undefined) {
+      this.factory = (await this.deploy(factoryAddress)) as ProxyFactory;
+    } else {
+      this.factory = (await this.ethers.getContractAtFromArtifact(
+        proxyFactoryArtifact,
+        factoryAddress
+      )) as ProxyFactory;
     }
-    return this._initialized;
   }
 
   async getFactory() {
-    if (this._initialized) {
-      return this.factory as ProxyFactory;
-    } else {
-      await this.init();
-    }
     return this.factory as ProxyFactory;
   }
   async deploy(overrides?: Overrides & { from?: PromiseOrValue<string> }) {
@@ -72,29 +56,17 @@ export class Factory {
       proxyFactoryArtifact
     );
     if (overrides === undefined) {
-      this.factory = await factoryBase.deploy();
+      return await factoryBase.deploy();
     } else {
-      this.factory = await factoryBase.deploy(overrides);
+      return await factoryBase.deploy(overrides);
     }
-    this._initialized = true;
   }
-  async init() {
-    if (this.factory.address === this.ethers.constants.AddressZero) {
-      await this.deploy();
-    } else {
-      this.factory = await this.ethers.getContractAtFromArtifact(
-        proxyFactoryArtifact,
-        this.factory.address
-      );
-    }
-    this._initialized = true;
-  }
+
   async changeFactory(factoryAddress: string) {
-    this.factory = await this.ethers.getContractAtFromArtifact(
+    this.factory = (await this.ethers.getContractAtFromArtifact(
       proxyFactoryArtifact,
       factoryAddress
-    );
-    this._initialized = true;
+    )) as ProxyFactory;
   }
   // multicall deploy logic, proxy, and upgrade proxy
   /**
