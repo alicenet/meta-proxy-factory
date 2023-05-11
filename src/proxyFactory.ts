@@ -30,14 +30,16 @@ export class MultiCallGasError extends Error {
 }
 
 export class Factory {
-  factory!: ProxyFactory;
+  private factory!: ProxyFactory;
   ethers: Ethers;
+  initialized: boolean = false;
+  private _initialized: Promise<void>;
   constructor(ethers: Ethers, factoryAddress?: string) {
     this.ethers = ethers;
-    this.init(factoryAddress);
+    this._initialized = this.init(factoryAddress);
   }
 
-  async init(factoryAddress?: string) {
+  async init(factoryAddress?: string): Promise<void> {
     if (factoryAddress === undefined) {
       this.factory = (await this.deploy(factoryAddress)) as ProxyFactory;
     } else {
@@ -46,9 +48,21 @@ export class Factory {
         factoryAddress
       )) as ProxyFactory;
     }
+    this.initialized = true;
   }
 
+  async isInitialized(): Promise<boolean> {
+    if (!this.initialized) {
+      try {
+        await this._initialized;
+      } catch (error) {
+        return false;
+      }
+    }
+    return true;
+  }
   async getFactory() {
+    await this.isInitialized();
     return this.factory as ProxyFactory;
   }
   async deploy(overrides?: Overrides & { from?: PromiseOrValue<string> }) {
