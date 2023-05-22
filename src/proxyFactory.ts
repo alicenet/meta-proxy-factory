@@ -69,10 +69,13 @@ export class Factory {
     let factoryBase = await this.ethers.getContractFactoryFromArtifact(
       proxyFactoryArtifact
     );
+    let factory;
     if (overrides === undefined) {
-      return await factoryBase.deploy();
+      factory = await factoryBase.deploy();
+      return await factory.deployed();
     } else {
-      return await factoryBase.deploy(overrides);
+      factory = await factoryBase.deploy(overrides);
+      return await factory.deployed();
     }
   }
 
